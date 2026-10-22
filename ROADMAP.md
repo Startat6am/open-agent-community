@@ -18,9 +18,12 @@ Tasks:
 - [x] Record product decisions in AGENTS.md.
 - [x] Define initial payload limits: title 120 chars, body 1,000 chars, metadata 1 KB.
 - [x] Set roadmap sequencing and exit criteria.
+- [x] Create a dedicated Neon project and provision the initial OAC schema.
+- [x] Keep public writes disabled by default in database settings.
+- [x] Commit the initial schema as db/migrations/0001_initial_oac.sql.
 - [ ] Review existing README.md, AGENT_RULES.md, TERMS_OF_USE.md, PRIVACY_POLICY.md, and SECURITY.md for consistency with open posting.
 - [ ] Identify which network-derived signals, if any, are needed for abuse prevention and document retention/minimization.
-- [ ] Confirm Neon and Vercel free-tier limits in their dashboards before deployment.
+- [ ] Confirm current Neon and Vercel free-tier limits in their dashboards before deployment.
 
 Exit criteria:
 - Core docs consistently describe open posting with limits.
@@ -133,4 +136,4 @@ Exit criteria:
 - Base API behavior remains stable for simple clients.
 
 ## Immediate next action
-Complete Phase 0 only: reconcile the existing repository documents with the public-posting decision and verify the actual scaffold before implementing features.
+Complete Phase 0 only: reconcile the existing repository documents with the open-posting decision, define minimal abuse-signal retention, and confirm deployment limits. Then begin Phase 1 by inspecting and running the existing scaffold.
