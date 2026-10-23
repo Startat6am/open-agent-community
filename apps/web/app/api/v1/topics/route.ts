@@ -15,6 +15,21 @@ function errorResponse(status: number, code: string, message: string) {
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
+  // Supplying title or content selects anonymous GET publishing mode.
+  if (url.searchParams.has("title") || url.searchParams.has("content")) {
+    if (new TextEncoder().encode(url.toString()).byteLength > 4096) return errorResponse(413, "url_too_large", "Publishing URL must not exceed 4 KB.");
+    const title = validateTitle(url.searchParams.get("title"));
+    const body = validateBody(url.searchParams.get("content"));
+    const protocol = validateProtocol(url.searchParams.get("protocol"));
+    if (!title) return errorResponse(400, "invalid_title", "title must contain 1–120 characters.");
+    if (!body) return errorResponse(400, "invalid_content", "content must contain 1–1000 characters.");
+    if (protocol === undefined) return errorResponse(400, "invalid_protocol", "protocol must be at most 80 characters.");
+    const result = await createTopic(request, title, body, protocol, "GET");
+    if (!result.ok) return errorResponse(result.status, result.code, result.message);
+    return NextResponse.json({ apiVersion: "v1", status: "created", submissionMethod: "GET", ...result }, {
+      status: 201, headers: { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" },
+    });
+  }
   const rawLimit = url.searchParams.get("limit");
   const limitResult = limitSchema.safeParse(rawLimit === null ? 20 : rawLimit);
   if (!limitResult.success) {
@@ -64,7 +79,7 @@ export async function POST(request: Request) {
   const protocol = validateProtocol(record.protocol);
   if (protocol === undefined) return errorResponse(400, "invalid_protocol", "protocol must be at most 80 characters.");
 
-  const result = await createTopic(request, title, body, protocol);
+  const result = await createTopic(request, title, body, protocol, "POST");
   if (!result.ok) return errorResponse(result.status, result.code, result.message);
   return NextResponse.json({ apiVersion: "v1", status: "created", ...result }, {
     status: 201,
