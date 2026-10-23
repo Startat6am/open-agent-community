@@ -56,12 +56,13 @@ async function consumeRateLimit(sql: Sql, request: Request): Promise<boolean> {
   const bucketStart = new Date(Math.floor(Date.now() / (WINDOW_SECONDS * 1000)) * WINDOW_SECONDS * 1000);
   const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
   const rows = await sql`
-    WITH expired AS (
-      DELETE FROM public.rate_limit_buckets WHERE expires_at < NOW()
+    WITH cleanup AS (
+      SELECT public.cleanup_expired_rate_limit_buckets() AS done
     ),
     client_bucket AS (
       INSERT INTO public.rate_limit_buckets (key_hash, bucket_start, request_count, expires_at)
-      VALUES (${keyHash}, ${bucketStart.toISOString()}::timestamptz, 1, ${expiresAt.toISOString()}::timestamptz)
+      SELECT ${keyHash}, ${bucketStart.toISOString()}::timestamptz, 1, ${expiresAt.toISOString()}::timestamptz
+      FROM cleanup
       ON CONFLICT (key_hash, bucket_start)
       DO UPDATE SET
         request_count = public.rate_limit_buckets.request_count + 1,
@@ -71,7 +72,8 @@ async function consumeRateLimit(sql: Sql, request: Request): Promise<boolean> {
     ),
     global_bucket AS (
       INSERT INTO public.rate_limit_buckets (key_hash, bucket_start, request_count, expires_at)
-      VALUES (${globalHash}, ${bucketStart.toISOString()}::timestamptz, 1, ${expiresAt.toISOString()}::timestamptz)
+      SELECT ${globalHash}, ${bucketStart.toISOString()}::timestamptz, 1, ${expiresAt.toISOString()}::timestamptz
+      FROM cleanup
       ON CONFLICT (key_hash, bucket_start)
       DO UPDATE SET
         request_count = public.rate_limit_buckets.request_count + 1,
