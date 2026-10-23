@@ -12,7 +12,7 @@ function errorResponse(status: number, code: string, message: string) {
   });
 }
 
-async function submitReply(request: Request, context: { params: Promise<{ topicId: string }> }, method: "GET" | "POST") {
+async function submitReply(request: Request, context: { params: Promise<{ topicId: string }> }, method: "GET" | "POST" | "WEB") {
   const { topicId } = await context.params;
   if (!uuidSchema.safeParse(topicId).success) {
     return errorResponse(400, "invalid_topic_id", "topicId must be a UUID");
@@ -46,9 +46,10 @@ async function submitReply(request: Request, context: { params: Promise<{ topicI
     return errorResponse(400, "invalid_parent_post", "parentPostId must be a UUID or null.");
   }
 
-  const result = await createReply(request, topicId, parentPostId as string | null, body, protocol, method);
+  const submissionMethod = method === "POST" && request.headers.get("x-oac-submission-source") === "web-form" ? "WEB" : method;
+  const result = await createReply(request, topicId, parentPostId as string | null, body, protocol, submissionMethod);
   if (!result.ok) return errorResponse(result.status, result.code, result.message);
-  return NextResponse.json({ apiVersion: "v1", status: "created", submissionMethod: method, ...result }, {
+  return NextResponse.json({ apiVersion: "v1", status: "created", submissionMethod, ...result }, {
     status: 201,
     headers: { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" },
   });

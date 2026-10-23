@@ -5,6 +5,8 @@ const MAX_TITLE = 120;
 const MAX_BODY = 1000;
 const WINDOW_SECONDS = 60;
 const REQUESTS_PER_WINDOW = 5;
+// A shared ceiling limits aggregate write pressure even when requests come from many IPs.
+const GLOBAL_REQUESTS_PER_WINDOW = 300;
 
 type Sql = ReturnType<typeof neon>;
 
@@ -50,19 +52,40 @@ async function consumeRateLimit(sql: Sql, request: Request): Promise<boolean> {
   if (!secret || secret.length < 32 || !ip || ip.length > 100) return false;
 
   const keyHash = createHmac("sha256", secret).update(ip).digest("hex");
+  const globalHash = createHmac("sha256", secret).update("oac:global-write-limit").digest("hex");
   const bucketStart = new Date(Math.floor(Date.now() / (WINDOW_SECONDS * 1000)) * WINDOW_SECONDS * 1000);
   const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
   const rows = await sql`
-    INSERT INTO public.rate_limit_buckets (key_hash, bucket_start, request_count, expires_at)
-    VALUES (${keyHash}, ${bucketStart.toISOString()}::timestamptz, 1, ${expiresAt.toISOString()}::timestamptz)
-    ON CONFLICT (key_hash, bucket_start)
-    DO UPDATE SET
-      request_count = public.rate_limit_buckets.request_count + 1,
-      expires_at = EXCLUDED.expires_at
-    WHERE public.rate_limit_buckets.request_count < ${REQUESTS_PER_WINDOW}
-    RETURNING request_count
-  ` as unknown as Array<{ request_count: number }>;
-  return rows.length === 1;
+    WITH cleanup AS (
+      SELECT public.cleanup_expired_rate_limit_buckets() AS done
+    ),
+    client_bucket AS (
+      INSERT INTO public.rate_limit_buckets (key_hash, bucket_start, request_count, expires_at)
+      SELECT ${keyHash}, ${bucketStart.toISOString()}::timestamptz, 1, ${expiresAt.toISOString()}::timestamptz
+      FROM cleanup
+      ON CONFLICT (key_hash, bucket_start)
+      DO UPDATE SET
+        request_count = public.rate_limit_buckets.request_count + 1,
+        expires_at = EXCLUDED.expires_at
+      WHERE public.rate_limit_buckets.request_count < ${REQUESTS_PER_WINDOW}
+      RETURNING request_count
+    ),
+    global_bucket AS (
+      INSERT INTO public.rate_limit_buckets (key_hash, bucket_start, request_count, expires_at)
+      SELECT ${globalHash}, ${bucketStart.toISOString()}::timestamptz, 1, ${expiresAt.toISOString()}::timestamptz
+      FROM client_bucket
+      ON CONFLICT (key_hash, bucket_start)
+      DO UPDATE SET
+        request_count = public.rate_limit_buckets.request_count + 1,
+        expires_at = EXCLUDED.expires_at
+      WHERE public.rate_limit_buckets.request_count < ${GLOBAL_REQUESTS_PER_WINDOW}
+      RETURNING request_count
+    )
+    SELECT
+      (SELECT count(*) FROM client_bucket) AS client_allowed,
+      (SELECT count(*) FROM global_bucket) AS global_allowed
+  ` as unknown as Array<{ client_allowed: number | string; global_allowed: number | string }>;
+  return Number(rows[0]?.client_allowed) === 1 && Number(rows[0]?.global_allowed) === 1;
 }
 
 async function prepareWrite(request: Request): Promise<{ sql: Sql } | { error: "disabled" | "rate_limited" | "unavailable" }> {
@@ -86,7 +109,7 @@ export async function createTopic(
   title: string,
   body: string,
   protocol: string | null,
-  method: "GET" | "POST" = "POST",
+  method: "GET" | "POST" | "WEB" = "POST",
 ): Promise<WriteResult> {
   const prepared = await prepareWrite(request);
   if ("error" in prepared) return writeError(prepared.error);
@@ -116,7 +139,7 @@ export async function createReply(
   parentPostId: string | null,
   body: string,
   protocol: string | null,
-  method: "GET" | "POST" = "POST",
+  method: "GET" | "POST" | "WEB" = "POST",
 ): Promise<WriteResult> {
   const prepared = await prepareWrite(request);
   if ("error" in prepared) return writeError(prepared.error);

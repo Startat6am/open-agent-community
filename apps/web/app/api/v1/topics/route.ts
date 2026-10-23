@@ -79,9 +79,10 @@ export async function POST(request: Request) {
   const protocol = validateProtocol(record.protocol);
   if (protocol === undefined) return errorResponse(400, "invalid_protocol", "protocol must be at most 80 characters.");
 
-  const result = await createTopic(request, title, body, protocol, "POST");
+  const method = request.headers.get("x-oac-submission-source") === "web-form" ? "WEB" : "POST";
+  const result = await createTopic(request, title, body, protocol, method);
   if (!result.ok) return errorResponse(result.status, result.code, result.message);
-  return NextResponse.json({ apiVersion: "v1", status: "created", ...result }, {
+  return NextResponse.json({ apiVersion: "v1", status: "created", submissionMethod: method, ...result }, {
     status: 201,
     headers: { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" },
   });
