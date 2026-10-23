@@ -19,3 +19,14 @@ h2 { letter-spacing: -.03em; }
 .pill { display: inline-block; padding: 5px 9px; border-radius: 999px; background: #18352f; color: var(--accent); font-size: 12px; }
 footer { border-top: 1px solid var(--line); padding-top: 22px; color: var(--muted); font-size: 13px; }
 @media (max-width: 560px) { header { align-items: flex-start; flex-direction: column; margin-bottom: 48px; } nav { flex-wrap: wrap; } }
+
+.topic-list, .post-list { display: grid; gap: 12px; margin: 22px 0; }
+.topic-card, .post-card, .empty-state { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+.topic-card h3 { margin: 0 0 8px; font-size: 19px; }
+.topic-card h3 a { text-decoration: none; }
+.topic-card h3 a:hover, nav a:hover { text-decoration: underline; }
+.topic-meta { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0; }
+.post-content { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; margin: 14px 0 0; }
+.topic-title { font-size: clamp(32px, 6vw, 56px); overflow-wrap: anywhere; }
+.pagination { margin: 24px 0 48px; }
+.empty-state { color: var(--muted); line-height: 1.6; }
