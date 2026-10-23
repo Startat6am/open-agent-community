@@ -12,7 +12,7 @@ This roadmap is the execution order for the MVP. Work on one phase at a time. Do
 - Transparent data practices and human review for disputed moderation cases.
 
 ## Phase 0 — Align project contract and limits
-**Status: In progress**
+**Status: Complete with operator acceptance of residual quota uncertainty**
 
 Tasks:
 - [x] Record product decisions in AGENTS.md.
@@ -24,22 +24,25 @@ Tasks:
 - [x] Review README.md, AGENT_RULES.md, TERMS_OF_USE.md, PRIVACY_POLICY.md, and SECURITY.md for consistency with open posting; update mismatches found.
 - [x] Document proposed abuse-signal minimization and retention in docs/ABUSE_DATA_RETENTION.md and align the privacy/security drafts.
 - [x] Verify current account plan tiers: Neon Free and Vercel Hobby (dashboard/API metadata checked on 2026-10-23).
-- [ ] Check the applicable Neon/Vercel quotas, remaining usage, and current free-tier limits in the provider dashboards before deployment. Plan tiers are known, but this pass did not confirm all quota ceilings or remaining balances.
+- [x] Inspect available provider plan and usage data. Neon Free and Vercel Hobby are confirmed; Neon API returned current project usage counters, but exact remaining quota balances were not exposed by the available tools. The operator explicitly accepted proceeding with this residual uncertainty on 2026-10-23.
 
 Exit criteria:
 - Core docs consistently describe open posting with limits.
 - No document promises anonymous posting is abuse-proof or claims legal compliance without review.
 - Data collection and retention assumptions are documented.
-- Provider plan/usage assumptions are verified before deployment.
+- Provider plans and available usage data are recorded; the operator accepted that exact remaining quota balances could not be independently verified. Re-check the dashboards before any public launch.
 
 ## Phase 1 — Inspect and make the scaffold runnable
-**Status: Not started**
+**Status: In progress**
 
 Tasks:
-- Inspect the full repository tree, package scripts, existing app routes, tests, and migrations.
-- Run install, lint/typecheck/test/build where configured; record failures.
-- Fix only blocking scaffold issues; do not implement future features in this phase.
-- Document local setup and required environment variables.
+- [x] Inspect root and web package scripts, Next.js app routes, configuration, environment template, and initial SQL migration.
+- [x] Inspect recent Vercel build logs. The previous deployments failed because the install step installed only the root dependency and the web build could not find `next` (`next: command not found`).
+- [x] Identify missing root `pnpm-lock.yaml`; the execution environment cannot clone the repository or access the package registry directly, so local install/lint/test/build could not be run here.
+- [ ] Validate the corrected Vercel install/build settings and confirm a successful deployment.
+- [ ] Run lint, tests, and a production build; document any remaining failures.
+- [ ] Fix only blocking scaffold issues; do not implement future-phase features.
+- [ ] Confirm local setup and required environment variables are documented.
 
 Exit criteria:
 - The app starts locally using documented steps.
@@ -138,4 +141,4 @@ Exit criteria:
 - Base API behavior remains stable for simple clients.
 
 ## Immediate next action
-Finish the remaining Phase 0 deployment-limit check only. Do not start Phase 1 until this phase's exit criteria are met. After Phase 0, inspect and run the scaffold without implementing later-phase features.
+Finish Phase 1 by validating dependency installation, lint, tests, and production build. Do not implement public-board or posting features until the scaffold is runnable.
