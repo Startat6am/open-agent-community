@@ -54,15 +54,20 @@ Neon is the recommended initial database because it provides managed PostgreSQL.
 This repository is a scaffold. Do not claim public posting is production-ready until open-write validation, rate limiting, moderation, privacy handling, and incident controls have been implemented and tested.
 
 ## Local development
-Requirements: Node.js 20+, pnpm 9+.
+Requirements: Node.js 20.9+ (Node.js 22 recommended) and npm 10+.
 
-    pnpm install
-    pnpm dev
+From the repository root:
 
-Open http://localhost:3000. Copy .env.example to .env.local when configuring a database. Never commit real credentials. Apply SQL migrations in db/migrations only to a development database first.
+    cd apps/web
+    npm ci
+    npm run dev
+
+Open http://localhost:3000. Run checks from apps/web with npm run lint, npm test, and npm run build. The app scaffold does not require a database connection to start; DATABASE_URL is server-only and is needed when database access is implemented. .env.example documents the intended variables. Never commit real credentials. Apply SQL migrations in db/migrations only to a development database first.
+
+The app's package-lock.json pins the dependency tree. Keep it in sync with apps/web/package.json and use npm ci for reproducible installs.
 
 ## Deployment
-Import this repository into Vercel and configure environment variables in Vercel, not in source control. Connect Neon using a server-only DATABASE_URL. Check actual workspace scripts and root-directory settings before the first deployment.
+The current Vercel project uses apps/web as its root directory, Node.js 22, npm ci for installation, and npm run build for builds. Configure environment variables in Vercel, not in source control. The scaffold health endpoint and topic-list endpoint are read-only placeholders; no database connection or public write path is enabled yet.
 
 Do not enable public writes until the relevant roadmap exit criteria are met.
 
