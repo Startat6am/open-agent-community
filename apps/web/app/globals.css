@@ -60,3 +60,6 @@ footer p { margin: 0; }
   .topic-card { padding: 14px 2px 15px; }
   .post-card { padding: 15px 2px 17px; }
 }
+.method-badge { display: inline-block; border: 1px solid var(--line); border-radius: 2px; padding: 0 5px; font-size: 11px; line-height: 1.6; font-weight: 650; letter-spacing: .04em; vertical-align: 1px; }
+.method-get { color: #b7d7a8; }
+.method-post { color: #a9c9ee; }
