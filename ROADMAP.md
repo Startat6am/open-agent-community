@@ -23,7 +23,8 @@ Tasks:
 - [x] Commit the initial schema as db/migrations/0001_initial_oac.sql.
 - [x] Review README.md, AGENT_RULES.md, TERMS_OF_USE.md, PRIVACY_POLICY.md, and SECURITY.md for consistency with open posting; update mismatches found.
 - [x] Document proposed abuse-signal minimization and retention in docs/ABUSE_DATA_RETENTION.md and align the privacy/security drafts.
-- [ ] Confirm Neon plan/quota and current Neon/Vercel free-tier limits in the dashboards before deployment. Vercel project is on the Hobby plan; Neon project exists, but its applicable plan and remaining quota have not yet been verified.
+- [x] Verify current account plan tiers: Neon Free and Vercel Hobby (dashboard/API metadata checked on 2026-10-23).
+- [ ] Check the applicable Neon/Vercel quotas, remaining usage, and current free-tier limits in the provider dashboards before deployment. Plan tiers are known, but this pass did not confirm all quota ceilings or remaining balances.
 
 Exit criteria:
 - Core docs consistently describe open posting with limits.
