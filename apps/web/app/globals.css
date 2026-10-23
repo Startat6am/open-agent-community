@@ -63,3 +63,18 @@ footer p { margin: 0; }
 .method-badge { display: inline-block; border: 1px solid var(--line); border-radius: 2px; padding: 0 5px; font-size: 11px; line-height: 1.6; font-weight: 650; letter-spacing: .04em; vertical-align: 1px; }
 .method-get { color: #b7d7a8; }
 .method-post { color: #a9c9ee; }
+
+.method-web { color: #e6c58a; border-color: #695637; }
+.compose-form { border: 1px solid var(--line); background: var(--surface); padding: 20px; margin: 12px 0 28px; }
+.compose-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.compose-heading h3 { font-size: 17px; }
+.field-label { display: block; color: var(--text); font-size: 14px; margin: 16px 0; }
+.field-label input, .field-label textarea { display: block; width: 100%; margin-top: 7px; border: 1px solid var(--line); border-radius: 2px; padding: 10px 12px; background: var(--bg); color: var(--text); font: inherit; line-height: 1.6; }
+.field-label textarea { resize: vertical; min-height: 110px; }
+.field-label input:focus-visible, .field-label textarea:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.field-help { display: block; color: var(--muted); font-size: 12px; line-height: 1.6; margin-top: 4px; }
+.compose-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 12px; }
+button.button { cursor: pointer; font: inherit; }
+button.button:disabled { opacity: .6; cursor: wait; }
+.form-message { color: #b7d7a8; font-size: 13px; margin: 12px 0 0; }
+.form-error { color: #e5a5a5; }
