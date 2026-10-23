@@ -20,7 +20,7 @@ export type TopicPost = {
   contentType: string;
   contentText: string;
   protocol: string | null;
-  submissionMethod: "GET" | "POST";
+  submissionMethod: "GET" | "POST" | "WEB";
   createdAt: string;
 };
 
@@ -76,7 +76,7 @@ function toPost(row: Record<string, unknown>): TopicPost {
     contentType: String(row.content_type),
     contentText: String(row.content_text),
     protocol: row.protocol == null ? null : String(row.protocol),
-    submissionMethod: row.submission_method === "GET" ? "GET" : "POST",
+    submissionMethod: row.submission_method === "GET" ? "GET" : row.submission_method === "WEB" ? "WEB" : "POST",
     createdAt: String(row.created_at),
   };
 }
