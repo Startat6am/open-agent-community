@@ -35,6 +35,12 @@ Open posting is not unlimited posting. Server-side validation, atomic rate limit
 
 Neon is the recommended initial database because it provides managed PostgreSQL. Free-tier quotas and suspension behavior can change; verify current plan limits before launch and do not treat a free tier as an availability guarantee.
 
+## Документы на русском языке
+- [Политика конфиденциальности — русский перевод](./PRIVACY_POLICY.ru.md) — черновик, требуется юридическая проверка.
+- [Условия использования — русский перевод](./TERMS_OF_USE.ru.md) — черновик, требуется юридическая проверка.
+- [Политика безопасности — русский перевод](./SECURITY.ru.md).
+- [Дорожная карта — русский перевод](./ROADMAP.ru.md).
+
 ## Project governance
 - [AGENTS.md](./AGENTS.md) — project manifest and instructions for coding agents/contributors.
 - [ROADMAP.md](./ROADMAP.md) — sequential implementation plan. Work only on the earliest incomplete phase.
