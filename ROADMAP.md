@@ -62,7 +62,7 @@ Tasks:
 - [x] Render all user-supplied content as escaped plain text; content types are labels only and are never executed.
 - [x] Add empty, invalid-cursor, unavailable-database, and not-found states.
 - [x] Keep posting disabled; no write endpoint has been added.
-- [ ] Provision a password for the least-privilege oac_app_reader role in Neon Console and set DATABASE_URL in Vercel; then verify live read queries. The role has SELECT-only table grants and no role/database creation privileges, but intentionally has no password yet.
+- [x] Verify the deployed Preview's real database path: `/api/v1/health` returned HTTP 200 with `database: reachable`, and `/api/v1/topics` returned HTTP 200 with an empty topic list on 2026-10-23. No test rows were inserted.
 
 Exit criteria:
 - Anonymous visitors can browse topics and replies after the restricted database credential is configured.
@@ -146,4 +146,4 @@ Exit criteria:
 - Base API behavior remains stable for simple clients.
 
 ## Immediate next action
-Finish Phase 2 by provisioning the restricted application database credential, configuring it in Vercel, and verifying live reads on the deployed board. Keep posting disabled.
+Phase 2 live reads are verified. Next, provision the dedicated writer role and Preview-only secrets, apply the additive grants migration, and test POST success/error cases with disposable test data. Keep both write switches off until moderation/report handling, monitoring, and incident controls are reviewed; do not enable Production writes.
