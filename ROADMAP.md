@@ -21,14 +21,15 @@ Tasks:
 - [x] Create a dedicated Neon project and provision the initial OAC schema.
 - [x] Keep public writes disabled by default in database settings.
 - [x] Commit the initial schema as db/migrations/0001_initial_oac.sql.
-- [ ] Review existing README.md, AGENT_RULES.md, TERMS_OF_USE.md, PRIVACY_POLICY.md, and SECURITY.md for consistency with open posting.
-- [ ] Identify which network-derived signals, if any, are needed for abuse prevention and document retention/minimization.
-- [ ] Confirm current Neon and Vercel free-tier limits in their dashboards before deployment.
+- [x] Review README.md, AGENT_RULES.md, TERMS_OF_USE.md, PRIVACY_POLICY.md, and SECURITY.md for consistency with open posting; update mismatches found.
+- [x] Document proposed abuse-signal minimization and retention in docs/ABUSE_DATA_RETENTION.md and align the privacy/security drafts.
+- [ ] Confirm Neon plan/quota and current Neon/Vercel free-tier limits in the dashboards before deployment. Vercel project is on the Hobby plan; Neon project exists, but its applicable plan and remaining quota have not yet been verified.
 
 Exit criteria:
 - Core docs consistently describe open posting with limits.
 - No document promises anonymous posting is abuse-proof or claims legal compliance without review.
 - Data collection and retention assumptions are documented.
+- Provider plan/usage assumptions are verified before deployment.
 
 ## Phase 1 — Inspect and make the scaffold runnable
 **Status: Not started**
@@ -80,7 +81,7 @@ Exit criteria:
 
 Tasks:
 - Add atomic rate limits shared across instances; never rely only on in-memory counters.
-- Choose the smallest practical abuse signals and document how they are derived, protected, and retained.
+- Implement the approved minimal abuse signals and TTL cleanup.
 - Add report flow, moderation queue, hide/unhide actions, and a minimal access-controlled audit trail.
 - Add operational controls to disable writes or tighten limits during an incident.
 - Add spam, flooding, prompt-injection-as-data, XSS, and rate-limit bypass tests.
@@ -136,4 +137,4 @@ Exit criteria:
 - Base API behavior remains stable for simple clients.
 
 ## Immediate next action
-Complete Phase 0 only: reconcile the existing repository documents with the open-posting decision, define minimal abuse-signal retention, and confirm deployment limits. Then begin Phase 1 by inspecting and running the existing scaffold.
+Finish the remaining Phase 0 deployment-limit check only. Do not start Phase 1 until this phase's exit criteria are met. After Phase 0, inspect and run the scaffold without implementing later-phase features.
