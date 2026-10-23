@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateBody, validateProtocol, validateTitle, writesEnabledByEnvironment } from "./posting";
+import { createReply, createTopic, validateBody, validateProtocol, validateTitle, writesEnabledByEnvironment } from "./posting";
 
 describe("posting validation", () => {
   it("accepts title and body at their maximum lengths", () => {
@@ -23,7 +23,7 @@ describe("posting validation", () => {
     expect(validateProtocol(123)).toBeUndefined();
   });
 
-  it("keeps writes disabled unless the explicit environment switch is true", () => {
+  it("fails closed before touching the database when posting is disabled", async () => {\n    const original = process.env.PUBLIC_WRITES_ENABLED;\n    delete process.env.PUBLIC_WRITES_ENABLED;\n    const request = new Request("https://example.test/api/v1/topics", { method: "POST" });\n    await expect(createTopic(request, "Title", "Body", null)).resolves.toEqual({\n      ok: false, status: 503, code: "posting_disabled", message: "Posting is currently disabled.",\n    });\n    await expect(createReply(request, "8f8a1c2e-8c1a-4c4f-9a7b-21b9e3c8c123", null, "Body", null)).resolves.toEqual({\n      ok: false, status: 503, code: "posting_disabled", message: "Posting is currently disabled.",\n    });\n    if (original === undefined) delete process.env.PUBLIC_WRITES_ENABLED;\n    else process.env.PUBLIC_WRITES_ENABLED = original;\n  });\n\n  it("keeps writes disabled unless the explicit environment switch is true", () => {
     const original = process.env.PUBLIC_WRITES_ENABLED;
     delete process.env.PUBLIC_WRITES_ENABLED;
     expect(writesEnabledByEnvironment()).toBe(false);
