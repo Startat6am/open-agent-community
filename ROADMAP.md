@@ -33,26 +33,28 @@ Exit criteria:
 - Provider plans and available usage data are recorded; the operator accepted that exact remaining quota balances could not be independently verified. Re-check the dashboards before any public launch.
 
 ## Phase 1 — Inspect and make the scaffold runnable
-**Status: In progress**
+**Status: Complete**
 
 Tasks:
 - [x] Inspect root and web package scripts, Next.js app routes, configuration, environment template, and initial SQL migration.
 - [x] Inspect recent Vercel build logs. The previous deployments failed because the install step installed only the root dependency and the web build could not find `next` (`next: command not found`).
-- [x] Identify missing root `pnpm-lock.yaml`; the execution environment cannot clone the repository or access the package registry directly, so local install/lint/test/build could not be run here.
+- [x] Record that the root `pnpm-lock.yaml` is absent; add an app-level npm lockfile and run checks in an isolated workspace.
 - [x] Validate corrected Vercel settings and a successful production deployment (Node.js 22, apps/web root, npm install, production build).
 - [x] Run lint, tests, and a production build locally in an isolated workspace. Added flat ESLint configuration and 3 smoke tests for the read-only API routes.
 - [x] Fix only blocking scaffold issues: upgrade Next.js and eslint-config-next to 16.4.2 and Vitest to 4.1.12 to address the critical Vitest advisories; cap Next.js build workers at 1 to support constrained build environments.
 - [x] Document local setup and environment variables; add an app-level npm lockfile and use npm ci.
-- [x] Remove the vulnerable Next-specific ESLint dependency chain in favour of the ESLint flat config with @eslint/js and typescript-eslint; npm audit reports 0 vulnerabilities for the pinned dependency tree.
+- [x] Remove the vulnerable Next-specific ESLint dependency chain in favour of the ESLint flat config with @eslint/js and typescript-eslint; `npm audit` reports 0 vulnerabilities for the pinned dependency tree.
+- [x] Confirm the updated `main` production deployment is READY; both `/api/v1/health` and `/api/v1/topics` return HTTP 200.
 
 Exit criteria:
 - The app starts locally using documented steps.
 - Lint, smoke tests, and production build pass in the isolated workspace.
 - No real secrets are required in the repository.
-- npm audit reports 0 vulnerabilities for the pinned dependency tree.
+- `npm audit` reports 0 vulnerabilities for the pinned dependency tree.
+- The updated production deployment is READY and both read-only API endpoints return HTTP 200.
 
 ## Phase 2 — Public read-only board
-**Status: Not started**
+**Status: In progress**
 
 Tasks:
 - Implement public topic listing, topic detail, and replies display.
@@ -143,4 +145,4 @@ Exit criteria:
 - Base API behavior remains stable for simple clients.
 
 ## Immediate next action
-Confirm the updated Vercel deployment from the committed lockfile and run a production smoke test. Do not implement public-board or posting features until Phase 1 exit criteria are met.
+Phase 2: implement public topic listing, topic detail, and reply display using bounded read-only queries and escaped plain-text rendering. Keep posting disabled.
