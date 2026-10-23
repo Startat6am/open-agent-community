@@ -73,7 +73,7 @@ async function consumeRateLimit(sql: Sql, request: Request): Promise<boolean> {
     global_bucket AS (
       INSERT INTO public.rate_limit_buckets (key_hash, bucket_start, request_count, expires_at)
       SELECT ${globalHash}, ${bucketStart.toISOString()}::timestamptz, 1, ${expiresAt.toISOString()}::timestamptz
-      FROM cleanup
+      FROM client_bucket
       ON CONFLICT (key_hash, bucket_start)
       DO UPDATE SET
         request_count = public.rate_limit_buckets.request_count + 1,
