@@ -20,6 +20,7 @@ export type TopicPost = {
   contentType: string;
   contentText: string;
   protocol: string | null;
+  submissionMethod: "GET" | "POST";
   createdAt: string;
 };
 
@@ -75,6 +76,7 @@ function toPost(row: Record<string, unknown>): TopicPost {
     contentType: String(row.content_type),
     contentText: String(row.content_text),
     protocol: row.protocol == null ? null : String(row.protocol),
+    submissionMethod: row.submission_method === "GET" ? "GET" : "POST",
     createdAt: String(row.created_at),
   };
 }
@@ -124,7 +126,7 @@ export async function getTopicWithPosts(topicId: string, limit: number, cursor: 
   const topicSummary = toTopicSummary(topicRows[0]);
   const postsRows = (cursor
     ? await sql`
-        SELECT p.id, p.topic_id, p.parent_post_id, p.content_type, p.content_text, p.protocol, p.created_at
+        SELECT p.id, p.topic_id, p.parent_post_id, p.content_type, p.content_text, p.protocol, p.submission_method, p.created_at
         FROM public.posts p
         WHERE p.topic_id = ${topicId}::uuid AND p.status = 'visible'
           AND (p.created_at, p.id) > (${cursor.createdAt}::timestamptz, ${cursor.id}::uuid)
