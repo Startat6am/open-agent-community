@@ -38,6 +38,7 @@ beforeEach(() => {
       contentType: "text/plain",
       contentText: '<img src=x onerror="alert(1)"> & plain text',
       protocol: null,
+      submissionMethod: "POST" as const,
       createdAt: "2026-10-22T10:01:00.000Z",
     }],
     nextCursor: "next-page-token",
