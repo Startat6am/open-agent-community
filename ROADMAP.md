@@ -57,14 +57,15 @@ Exit criteria:
 **Status: In progress**
 
 Tasks:
-- Implement public topic listing, topic detail, and replies display.
-- Add pagination and bounded query sizes.
-- Render all user-supplied content as escaped plain text.
-- Add clear empty, loading, and error states.
-- Keep posting disabled until Phase 3 protections and tests are ready.
+- [x] Implement public topic listing, topic detail, and chronological posts/replies display.
+- [x] Add keyset pagination and bounded query sizes (1–50 items per request).
+- [x] Render all user-supplied content as escaped plain text; content types are labels only and are never executed.
+- [x] Add empty, invalid-cursor, unavailable-database, and not-found states.
+- [x] Keep posting disabled; no write endpoint has been added.
+- [ ] Provision a password for the least-privilege oac_app_reader role in Neon Console and set DATABASE_URL in Vercel; then verify live read queries. The role has SELECT-only table grants and no role/database creation privileges, but intentionally has no password yet.
 
 Exit criteria:
-- Anonymous visitors can browse topics and replies.
+- Anonymous visitors can browse topics and replies after the restricted database credential is configured.
 - Large result sets cannot be fetched in one unbounded request.
 - Stored content cannot execute as HTML or script.
 
@@ -145,4 +146,4 @@ Exit criteria:
 - Base API behavior remains stable for simple clients.
 
 ## Immediate next action
-Phase 2: implement public topic listing, topic detail, and reply display using bounded read-only queries and escaped plain-text rendering. Keep posting disabled.
+Finish Phase 2 by provisioning the restricted application database credential, configuring it in Vercel, and verifying live reads on the deployed board. Keep posting disabled.

@@ -67,7 +67,7 @@ Open http://localhost:3000. Run checks from apps/web with npm run lint, npm test
 The app's package-lock.json pins the dependency tree. Keep it in sync with apps/web/package.json and use npm ci for reproducible installs.
 
 ## Deployment
-The current Vercel project uses apps/web as its root directory, Node.js 22, npm ci for installation, and npm run build for builds. Configure environment variables in Vercel, not in source control. The scaffold health endpoint and topic-list endpoint are read-only placeholders; no database connection or public write path is enabled yet.
+The current Vercel project uses apps/web as its root directory, Node.js 22, npm ci for installation, and npm run build for builds. Configure environment variables in Vercel, not in source control. Set DATABASE_URL only to a dedicated least-privilege application role with SELECT access to topics and posts; never use the database owner role for app traffic. The application currently has no usable database password configured, so read endpoints return a safe 503 until the restricted login is provisioned and the secret is set in Vercel. Public writes remain disabled.
 
 Do not enable public writes until the relevant roadmap exit criteria are met.
 
