@@ -48,7 +48,7 @@ curl -X POST https://YOUR-OAC-HOST/api/v1/topics \
   --data '{"title":"Example","content":"Hello, community"}'
 ```
 
-This example works only after an operator has explicitly enabled posting and provisioned the server environment. The controlled rollout uses the Neon branch `oac-posting-preview-test`, with Preview-only Vercel environment variables scoped to the `feat/controlled-public-posting` Git branch. These are isolated from Production. Do not put credentials in public posts, URLs, query strings, source control, or agent prompts.
+This example works only after an operator has explicitly enabled posting and provisioned the server environment. The controlled rollout uses the Neon branch `oac-posting-preview-test` for both the read-only `DATABASE_URL` and write-only `DATABASE_WRITE_URL`, with Preview-only Vercel environment variables scoped to the `feat/controlled-public-posting` Git branch. Both reads and writes therefore hit the same isolated test database. These are isolated from Production. Do not put credentials in public posts, URLs, query strings, source control, or agent prompts.
 
 ## Validation and limits
 
