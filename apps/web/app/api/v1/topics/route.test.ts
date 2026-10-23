@@ -1,37 +1,65 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("../../../../lib/topics", () => ({
+  decodeCursor: vi.fn(),
+  listTopics: vi.fn(),
+}));
+
+import { decodeCursor, listTopics } from "../../../../lib/topics";
 import { GET } from "./route";
 
-const previousRegistrationFlag = process.env.AGENT_REGISTRATION_ENABLED;
+const samplePage = {
+  topics: [{
+    id: "8f8a1c2e-8c1a-4c4f-9a7b-21b9e3c8c123",
+    title: "A public hypothesis",
+    createdAt: "2026-10-22T10:00:00.000Z",
+    updatedAt: "2026-10-22T10:00:00.000Z",
+    postCount: 2,
+  }],
+  nextCursor: "eyJpZCI6ImN1cnNvciJ9",
+};
 
-afterEach(() => {
-  if (previousRegistrationFlag === undefined) {
-    delete process.env.AGENT_REGISTRATION_ENABLED;
-  } else {
-    process.env.AGENT_REGISTRATION_ENABLED = previousRegistrationFlag;
-  }
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.mocked(decodeCursor).mockReturnValue(null);
+  vi.mocked(listTopics).mockResolvedValue(samplePage);
 });
 
 describe("GET /api/v1/topics", () => {
-  it("returns a bounded empty read-only response by default", async () => {
-    delete process.env.AGENT_REGISTRATION_ENABLED;
-    const response = await GET();
+  it("returns a bounded public topic page and keeps writes disabled", async () => {
+    const response = await GET(new Request("https://oac.test/api/v1/topics"));
     const body = await response.json();
 
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(body).toMatchObject({
       apiVersion: "v1",
-      status: "prototype",
+      status: "ok",
       registrationEnabled: false,
-      topics: [],
-      pagination: { limit: 20, nextCursor: null },
+      topics: samplePage.topics,
+      pagination: { limit: 20, nextCursor: samplePage.nextCursor },
     });
-    expect(body.notice).toContain("Write operations are not enabled");
+    expect(listTopics).toHaveBeenCalledWith(20, null);
   });
 
-  it("does not enable registration unless the flag is exactly true", async () => {
-    process.env.AGENT_REGISTRATION_ENABLED = "yes";
-    const response = await GET();
-    expect((await response.json()).registrationEnabled).toBe(false);
+  it("rejects unbounded or malformed limits", async () => {
+    const response = await GET(new Request("https://oac.test/api/v1/topics?limit=1000"));
+    expect(response.status).toBe(400);
+    expect((await response.json()).error.code).toBe("invalid_limit");
+    expect(listTopics).not.toHaveBeenCalled();
+  });
+
+  it("rejects an invalid cursor", async () => {
+    const response = await GET(new Request("https://oac.test/api/v1/topics?cursor=bad"));
+    expect(response.status).toBe(400);
+    expect((await response.json()).error.code).toBe("invalid_cursor");
+    expect(listTopics).not.toHaveBeenCalled();
+  });
+
+  it("returns a generic unavailable response when the database cannot be read", async () => {
+    vi.mocked(listTopics).mockRejectedValue(new Error("connection details must not leak"));
+    const response = await GET(new Request("https://oac.test/api/v1/topics"));
+    expect(response.status).toBe(503);
+    expect(await response.text()).not.toContain("connection details");
   });
 });
