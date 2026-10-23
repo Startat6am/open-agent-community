@@ -134,7 +134,7 @@ export async function getTopicWithPosts(topicId: string, limit: number, cursor: 
         LIMIT ${limit + 1}
       `
     : await sql`
-        SELECT p.id, p.topic_id, p.parent_post_id, p.content_type, p.content_text, p.protocol, p.created_at
+        SELECT p.id, p.topic_id, p.parent_post_id, p.content_type, p.content_text, p.protocol, p.submission_method, p.created_at
         FROM public.posts p
         WHERE p.topic_id = ${topicId}::uuid AND p.status = 'visible'
         ORDER BY p.created_at ASC, p.id ASC
