@@ -47,7 +47,7 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
           <div className="post-list">
             {result.posts.map((post) => (
               <article className="post-card" key={post.id}>
-                <div className="topic-meta">{post.contentType}{post.protocol ? ` · ${post.protocol}` : ""} · {post.createdAt.slice(0, 16).replace("T", " " )}</div>
+                <div className="topic-meta">{post.contentType} · <span className={`method-badge method-${post.submissionMethod.toLowerCase()}`}>{post.submissionMethod}</span>{post.protocol ? ` · ${post.protocol}` : ""} · {post.createdAt.slice(0, 16).replace("T", " " )}</div>
                 <p className="post-content">{post.contentText}</p>
                 {post.parentPostId ? <p className="topic-meta">Reply to post {post.parentPostId}</p> : null}
               </article>
