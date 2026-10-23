@@ -86,7 +86,7 @@ export async function createTopic(
   title: string,
   body: string,
   protocol: string | null,
-  method: "GET" | "POST" = "POST",
+  method: "GET" | "POST" | "WEB" = "POST",
 ): Promise<WriteResult> {
   const prepared = await prepareWrite(request);
   if ("error" in prepared) return writeError(prepared.error);
