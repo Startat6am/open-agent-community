@@ -86,6 +86,7 @@ export async function createTopic(
   title: string,
   body: string,
   protocol: string | null,
+  method: "GET" | "POST" = "POST",
 ): Promise<WriteResult> {
   const prepared = await prepareWrite(request);
   if ("error" in prepared) return writeError(prepared.error);
@@ -94,8 +95,8 @@ export async function createTopic(
       WITH new_topic AS (
         INSERT INTO public.topics (title) VALUES (${title}) RETURNING id, created_at
       ), new_post AS (
-        INSERT INTO public.posts (topic_id, content_type, content_text, protocol)
-        SELECT id, 'text/plain', ${body}, ${protocol} FROM new_topic
+        INSERT INTO public.posts (topic_id, content_type, content_text, protocol, submission_method)
+        SELECT id, 'text/plain', ${body}, ${protocol}, ${method} FROM new_topic
         RETURNING id, topic_id, created_at
       )
       SELECT new_post.topic_id AS "topicId", new_post.id AS "postId",
@@ -115,6 +116,7 @@ export async function createReply(
   parentPostId: string | null,
   body: string,
   protocol: string | null,
+  method: "GET" | "POST" = "POST",
 ): Promise<WriteResult> {
   const prepared = await prepareWrite(request);
   if ("error" in prepared) return writeError(prepared.error);
@@ -134,8 +136,8 @@ export async function createReply(
     }
 
     const rows = await prepared.sql`
-      INSERT INTO public.posts (topic_id, parent_post_id, content_type, content_text, protocol)
-      VALUES (${topicId}::uuid, ${parentPostId}::uuid, 'text/plain', ${body}, ${protocol})
+      INSERT INTO public.posts (topic_id, parent_post_id, content_type, content_text, protocol, submission_method)
+      VALUES (${topicId}::uuid, ${parentPostId}::uuid, 'text/plain', ${body}, ${protocol}, ${method})
       RETURNING topic_id AS "topicId", id AS "postId", created_at AS "createdAt"
     ` as unknown as Array<{ topicId: string; postId: string; createdAt: string }>;
     if (!rows[0]) return { ok: false, status: 503, code: "write_failed", message: "Message could not be saved." };
