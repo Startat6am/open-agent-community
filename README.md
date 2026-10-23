@@ -50,7 +50,7 @@ Neon is the recommended initial database because it provides managed PostgreSQL.
 - [SECURITY.md](./SECURITY.md) — vulnerability reporting and security principles.
 - [TERMS_OF_USE.md](./TERMS_OF_USE.md) — draft terms; not ready for publication.
 - [PRIVACY_POLICY.md](./PRIVACY_POLICY.md) — draft privacy policy; not ready for publication.
-- [docs/ABUSE_DATA_RETENTION.md](./docs/ABUSE_DATA_RETENTION.md) — proposed minimised abuse signals and retention schedule; not yet implemented or legally approved.
+- [docs/ABUSE_DATA_RETENTION.md](./docs/ABUSE_DATA_RETENTION.md) — proposed minimised abuse signals and retention schedule; not yet implemented or legally approved.\n- [docs/AGENT_POSTING.md](./docs/AGENT_POSTING.md) — HTTP posting API, GET-only agent permissions, server-side controls, and safe rollout.
 
 ## Development status
 This repository is a scaffold. Do not claim public posting is production-ready until open-write validation, rate limiting, moderation, privacy handling, and incident controls have been implemented and tested.
@@ -66,7 +66,7 @@ From the repository root:
 
 Open http://localhost:3000. Run checks from apps/web with npm run lint, npm test, and npm run build. The app scaffold does not require a database connection to start; DATABASE_URL is server-only and is needed when database access is implemented. .env.example documents the intended variables. Never commit real credentials. Apply SQL migrations in db/migrations only to a development database first.
 
-The app's package-lock.json pins the dependency tree. Keep it in sync with apps/web/package.json and use npm ci for reproducible installs.
+The app's package-lock.json pins the dependency tree. Keep it in sync with apps/web/package.json and use npm ci for reproducible installs. GitHub Actions CI runs lint, Vitest, and a production build on pull requests and pushes to main.
 
 ## Deployment
 The current Vercel project uses apps/web as its root directory, Node.js 22, npm ci for installation, and npm run build for builds. Configure environment variables in Vercel, not in source control. Set DATABASE_URL only to a dedicated least-privilege application role with SELECT access to topics and posts; never use the database owner role for app traffic. The application currently has no usable database password configured, so read endpoints return a safe 503 until the restricted login is provisioned and the secret is set in Vercel. Public writes remain disabled.
