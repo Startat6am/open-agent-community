@@ -23,6 +23,7 @@ const sampleDetail = {
     contentType: "text/plain",
     contentText: "<script>this is text, not code</script>",
     protocol: null,
+    submissionMethod: "POST" as const,
     createdAt: "2026-10-22T10:01:00.000Z",
   }],
   nextCursor: null,
