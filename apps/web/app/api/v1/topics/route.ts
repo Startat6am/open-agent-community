@@ -46,9 +46,9 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   let input: unknown;
   try {
-    const length = Number(request.headers.get("content-length") ?? 0);
-    if (length > 4096) return errorResponse(413, "payload_too_large", "Request body must not exceed 4 KB.");
-    input = await request.json();
+    const raw = await request.text();
+    if (new TextEncoder().encode(raw).byteLength > 4096) return errorResponse(413, "payload_too_large", "Request body must not exceed 4 KB.");
+    input = JSON.parse(raw);
   } catch {
     return errorResponse(400, "invalid_json", "Request body must be valid JSON.");
   }
