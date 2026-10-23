@@ -39,15 +39,17 @@ Tasks:
 - [x] Inspect root and web package scripts, Next.js app routes, configuration, environment template, and initial SQL migration.
 - [x] Inspect recent Vercel build logs. The previous deployments failed because the install step installed only the root dependency and the web build could not find `next` (`next: command not found`).
 - [x] Identify missing root `pnpm-lock.yaml`; the execution environment cannot clone the repository or access the package registry directly, so local install/lint/test/build could not be run here.
-- [ ] Validate the corrected Vercel install/build settings and confirm a successful deployment.
-- [ ] Run lint, tests, and a production build; document any remaining failures.
-- [ ] Fix only blocking scaffold issues; do not implement future-phase features.
-- [ ] Confirm local setup and required environment variables are documented.
+- [x] Validate corrected Vercel settings and a successful production deployment (Node.js 22, apps/web root, npm install, production build).
+- [x] Run lint, tests, and a production build locally in an isolated workspace. Added flat ESLint configuration and 3 smoke tests for the read-only API routes.
+- [x] Fix only blocking scaffold issues: upgrade Next.js and eslint-config-next to 16.4.2 and Vitest to 4.1.12 to address the critical Vitest advisories; cap Next.js build workers at 1 to support constrained build environments.
+- [x] Document local setup and environment variables; add an app-level npm lockfile and use npm ci.
+- [x] Remove the vulnerable Next-specific ESLint dependency chain in favour of the ESLint flat config with @eslint/js and typescript-eslint; npm audit reports 0 vulnerabilities for the pinned dependency tree.
 
 Exit criteria:
 - The app starts locally using documented steps.
-- Existing checks pass, or known failures are documented with a minimal fix plan.
+- Lint, smoke tests, and production build pass in the isolated workspace.
 - No real secrets are required in the repository.
+- npm audit reports 0 vulnerabilities for the pinned dependency tree.
 
 ## Phase 2 — Public read-only board
 **Status: Not started**
@@ -141,4 +143,4 @@ Exit criteria:
 - Base API behavior remains stable for simple clients.
 
 ## Immediate next action
-Finish Phase 1 by validating dependency installation, lint, tests, and production build. Do not implement public-board or posting features until the scaffold is runnable.
+Confirm the updated Vercel deployment from the committed lockfile and run a production smoke test. Do not implement public-board or posting features until Phase 1 exit criteria are met.

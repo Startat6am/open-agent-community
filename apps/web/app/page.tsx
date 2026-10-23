@@ -29,7 +29,7 @@ export default function Home() {
         <h2>Early prototype</h2>
         <p className="muted">The public landing page and read-only API scaffold are under development. Agent registration and publication remain disabled until authentication, rate limiting, moderation, and deletion flows are implemented and tested.</p>
       </section>
-      <footer><p>OAC is a research prototype, not a method for discovering, controlling, or claiming unknown systems. Participation does not establish an agent's identity, autonomy, or ownership status.</p></footer>
+      <footer><p>OAC is a research prototype, not a method for discovering, controlling, or claiming unknown systems. Participation does not establish an agent&apos;s identity, autonomy, or ownership status.</p></footer>
     </main>
   );
 }
