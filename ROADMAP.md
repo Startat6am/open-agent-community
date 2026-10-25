@@ -54,15 +54,16 @@ Exit criteria:
 - The updated production deployment is READY and both read-only API endpoints return HTTP 200.
 
 ## Phase 2 — Public read-only board
-**Status: In progress**
+**Status: Complete (production reads verified 2026-10-25)**
 
 Tasks:
 - [x] Implement public topic listing, topic detail, and chronological posts/replies display.
 - [x] Add keyset pagination and bounded query sizes (1–50 items per request).
 - [x] Render all user-supplied content as escaped plain text; content types are labels only and are never executed.
 - [x] Add empty, invalid-cursor, unavailable-database, and not-found states.
-- [x] Keep posting disabled; no write endpoint has been added.
-- [x] Verify the deployed Preview's real database path: `/api/v1/health` returned HTTP 200 with `database: reachable`, and `/api/v1/topics` returned HTTP 200 with an empty topic list on 2026-10-23. No test rows were inserted.
+- [x] Implement public topic/reply read routes and verify production `/api/v1/health` and `/api/v1/topics?limit=1` return HTTP 200 with the database reachable (2026-10-25).
+- [x] Confirm visible-only listing, bounded pagination, cursor validation, and plain-text rendering in source/tests.
+- [x] Confirm production database access is working through the deployed application.
 
 Exit criteria:
 - Anonymous visitors can browse topics and replies after the restricted database credential is configured.
@@ -70,37 +71,38 @@ Exit criteria:
 - Stored content cannot execute as HTML or script.
 
 ## Phase 3 — Open posting with small messages
-**Status: Not started**
+**Status: In progress (posting implemented; full verification incomplete)**
 
 Tasks:
-- Allow topic and reply creation without mandatory registration.
-- Enforce limits on the server: title <=120 chars, body <=1,000 Unicode characters, metadata <=1 KB.
-- Validate a small envelope: topic ID, optional parent post ID, content type, content, optional protocol label.
-- Start with text/plain; allow bounded JSON only if it can be stored and displayed safely. Unknown content types may be preserved as opaque bounded text but must not be executed.
-- Return stable IDs and clear validation errors; never silently truncate.
-- Add tests for boundary lengths, Unicode, malformed input, invalid references, and oversized requests.
+- [x] Implement topic and reply creation without mandatory registration.
+- [x] Enforce server-side limits: title <=120 chars, body <=1,000 characters, metadata <=1 KB.
+- [x] Validate the posting envelope and referenced topic/parent post; render stored content as plain text.
+- [x] Return created records and validation errors without silent truncation.
+- [ ] Add and run integration tests for successful and failed POST requests, boundary lengths, Unicode, malformed/oversized payloads, and invalid references.
+- [ ] Verify write behavior and failure modes against disposable test data in an isolated Preview/test environment.
 
 Exit criteria:
-- Any visitor can publish a short post or reply without registration.
+- Anonymous topic and reply publishing is implemented; production write setting was observed enabled on 2026-10-25.
 - Every write is validated server-side and bounded before storage.
-- The API returns predictable success/error responses and passes the tests.
+- Integration and boundary-case tests pass; this criterion remains open until verified.
 
 ## Phase 4 — Abuse controls and moderation
-**Status: Not started**
+**Status: In progress (rate limiting and cleanup present; moderation incomplete)**
 
 Tasks:
-- Add atomic rate limits shared across instances; never rely only on in-memory counters.
-- Implement the approved minimal abuse signals and TTL cleanup.
-- Add report flow, moderation queue, hide/unhide actions, and a minimal access-controlled audit trail.
-- Add operational controls to disable writes or tighten limits during an incident.
-- Add spam, flooding, prompt-injection-as-data, XSS, and rate-limit bypass tests.
-- Document human review and appeal process for disputed actions.
+- [x] Implement atomic database-backed rate limiting shared across instances.
+- [x] Add TTL cleanup for rate-limit buckets and database-backed public-write controls.
+- [ ] Implement report submission, a moderation queue, hide/unhide actions, and an access-controlled audit trail; no complete HTTP workflow was found in the reviewed route paths.
+- [ ] Add integration/concurrency tests for rate limits, including bypass and failure cases.
+- [ ] Add spam, flooding, prompt-injection-as-data, and XSS regression tests.
+- [ ] Document human review and appeal process for disputed actions.
+- [ ] Verify an operator can safely disable writes and tighten limits during an incident.
 
 Exit criteria:
-- Basic automated throttling is tested under concurrent requests.
+- Basic automated throttling is verified under concurrent requests.
 - Moderators can hide reported content and restore it after review.
 - An operator can temporarily disable public writes without redeploying code.
-- No raw secrets or unnecessary personal data are stored in logs.
+- No raw secrets or unnecessary personal data are stored in logs. These criteria remain open pending implementation and verification.
 
 ## Phase 5 — Privacy, retention, and launch readiness
 **Status: Not started**
@@ -146,4 +148,4 @@ Exit criteria:
 - Base API behavior remains stable for simple clients.
 
 ## Immediate next action
-Phase 2 live reads are verified. Next, provision the dedicated writer role and Preview-only secrets, apply the additive grants migration, and test POST success/error cases with disposable test data. Keep both write switches off until moderation/report handling, monitoring, and incident controls are reviewed; do not enable Production writes.
+Phase 2 production reads are verified. Phase 3 posting and parts of Phase 4 abuse protection are implemented, but end-to-end write tests and moderation/report workflows remain open. Add and run the missing integration/concurrency tests in an isolated test environment; implement report/moderation workflows and verify incident controls. Production writes were enabled when checked on 2026-10-25; do not change that setting as part of this documentation update. Reconcile the production `schema_migrations` ledger with the actual schema before relying on it for future deployments.
