@@ -66,9 +66,10 @@ Tasks:
 - [x] Confirm production database access is working through the deployed application.
 
 Exit criteria:
-- Anonymous visitors can browse topics and replies after the restricted database credential is configured.
+- Anonymous visitors can browse topics and replies in Production.
 - Large result sets cannot be fetched in one unbounded request.
 - Stored content cannot execute as HTML or script.
+- Least-privilege of the deployed database credential is not confirmed by this functional read check and remains a separate security follow-up.
 
 ## Phase 3 — Open posting with small messages
 **Status: In progress (posting implemented; full verification incomplete)**
