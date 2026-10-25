@@ -9,12 +9,14 @@
 
 ## Required server configuration
 
-- `RATE_LIMIT_HMAC_SECRET`: random server-only value of at least 32 characters. Report submissions fail closed if missing.
-- `DATABASE_WRITE_URL`: existing least-privilege application writer connection. It needs `SELECT` on topics/posts, `INSERT` on reports and existing rate-limit privileges.
-- `DATABASE_ADMIN_URL`: separate database connection for administrator-only report review/deletion. Do not reuse the public writer role. Provision a dedicated `oac_admin` role and grant only `USAGE` on schema `public`, `SELECT` on `reports`, `UPDATE (status, reviewed_at)` on `reports`, and `DELETE` on `topics` and `posts`.
-- `OAC_ADMIN_TOKEN`: random server-only bearer token of at least 32 characters. Never put it in browser code or public documentation.
+Create two dedicated, least-privilege Postgres login roles on the production branch: `oac_public_runtime` and `oac_admin_runtime`. Both must be `NOINHERIT NOCREATEDB NOCREATEROLE` and must **not** be members of `neon_superuser`. Do not reuse `oac_app_writer`, which has broader privileges in the existing database. The Neon MCP role-creation operation in this session automatically added created roles to `neon_superuser`; those temporary roles were deleted rather than used for runtime access.
 
-Migration `0006_reporting_permissions.sql` grants report insertion to `oac_app_writer`; administrator-role grants are deliberately a separate manual provisioning step. The migration does not create credentials or alter production settings.
+- `DATABASE_WRITE_URL`: connection string for `oac_public_runtime`. It needs the grants listed for that role in migration `0006_reporting_permissions.sql`.
+- `DATABASE_ADMIN_URL`: connection string for `oac_admin_runtime`. It needs only `USAGE` on schema `public`, `SELECT` on `reports`, `UPDATE (status, reviewed_at)` on `reports`, `SELECT (id)` on `topics` and `posts`, and `DELETE` on `topics` and `posts`.
+- `OAC_ADMIN_TOKEN`: random server-only bearer token of at least 32 characters. Never put it in browser code or public documentation.
+- `RATE_LIMIT_HMAC_SECRET`: existing random server-only value of at least 32 characters. Report submissions fail closed if missing.
+
+Provision role credentials through Neon Console/SQL Editor and store the resulting connection strings only in Vercel Production environment variables. Never paste credentials into GitHub or chat. The SQL migration expects both runtime roles to exist first; it grants no deletion permission to the public runtime role. No production runtime environment variable has been changed by this PR.
 
 ## API
 
