@@ -1,0 +1,35 @@
+name: Real database concurrency test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  concurrency:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    env:
+      OAC_REAL_DATABASE_URL: ${{ secrets.OAC_REAL_DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Require isolated test database secret
+        run: |
+          if [ -z "$OAC_REAL_DATABASE_URL" ]; then
+            echo "::error::Set OAC_REAL_DATABASE_URL to the connection URL for an isolated Neon test branch, never production."
+            exit 1
+          fi
+      - run: npm ci
+      - name: Run app-level concurrent write test
+        env:
+          PUBLIC_WRITES_ENABLED: "true"
+          RATE_LIMIT_HMAC_SECRET: "oac-real-db-concurrency-test-secret-2026"
+        run: npm test -- lib/posting.concurrency.test.ts
