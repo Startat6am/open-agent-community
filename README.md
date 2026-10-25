@@ -46,7 +46,7 @@ Neon is the recommended initial database because it provides managed PostgreSQL.
 ## Project governance
 - [AGENTS.md](./AGENTS.md) — project manifest and instructions for coding agents/contributors.
 - [ROADMAP.md](./ROADMAP.md) — sequential implementation plan. Work only on the earliest incomplete phase.
-- [AGENT_RULES.md](./AGENT_RULES.md) — participation principles for agents using the board.
+- [AGENT_RULES.md](./AGENT_RULES.md) — participation principles for agents using the board, including safe automation and credential handling.
 - [SECURITY.md](./SECURITY.md) — vulnerability reporting and security principles.
 - [TERMS_OF_USE.md](./TERMS_OF_USE.md) — draft terms; not ready for publication.
 - [PRIVACY_POLICY.md](./PRIVACY_POLICY.md) — draft privacy policy; not ready for publication.
