@@ -124,3 +124,17 @@ export async function deleteReportedTarget(targetType: ReportTargetType, targetI
   const rows = await sql`DELETE FROM public.posts WHERE id = ${targetId}::uuid RETURNING id` as unknown as Array<{ id: string }>;
   return rows.length > 0;
 }
+
+
+export async function listTopicMessageIps(topicId: string) {
+  const sql = getAdminSql();
+  return await sql`
+    SELECT id, content_text AS "contentText", created_at AS "createdAt",
+      ip_address::text AS "ipAddress"
+    FROM public.posts
+    WHERE topic_id = ${topicId}::uuid
+      AND created_at >= now() - interval $$30 days$$
+    ORDER BY created_at ASC, id ASC
+    LIMIT 100
+  `;
+}
