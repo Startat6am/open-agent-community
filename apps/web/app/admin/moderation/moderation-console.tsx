@@ -3,6 +3,12 @@
 import { useCallback, useState } from "react";
 
 type Status = "new" | "reviewing" | "resolved" | "dismissed";
+type MessageIp = {
+  id: string;
+  contentText: string;
+  createdAt: string;
+  ipAddress: string | null;
+};
 type Report = {
   id: string;
   targetType: "topic" | "post";
@@ -34,6 +40,9 @@ export default function ModerationConsole() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [topicId, setTopicId] = useState("");
+  const [messages, setMessages] = useState<MessageIp[]>([]);
+  const [ipLoading, setIpLoading] = useState(false);
 
   const request = useCallback(async (path: string, init: RequestInit = {}) => {
     const response = await fetch(path, {
@@ -47,6 +56,7 @@ export default function ModerationConsole() {
     });
     const data = await response.json().catch(() => null) as {
       reports?: Report[];
+      messages?: MessageIp[];
       error?: { message?: string };
     } | null;
     if (!response.ok) throw new Error(data?.error?.message || `Request failed (${response.status})`);
@@ -105,7 +115,7 @@ export default function ModerationConsole() {
   }
 
   function signOut() {
-    setToken(""); setTokenInput(""); setReports([]);
+    setToken(""); setTokenInput(""); setReports([]); setMessages([]); setTopicId("");
     setMessage("Signed out."); setError("");
   }
 
@@ -119,6 +129,34 @@ export default function ModerationConsole() {
       </label>
       <div className="compose-actions"><button className="button" type="submit">Continue</button></div>
     </form> : <>
+      <section className="ip-lookup">
+        <h2>Message IP lookup</h2>
+        <p className="topic-meta">Enter a topic UUID to inspect source IPs for messages posted in the last 30 days. Older messages may have no stored IP. These addresses are private moderation data.</p>
+        <form className="ip-lookup-form" onSubmit={async event => {
+          event.preventDefault();
+          if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(topicId.trim())) {
+            setError("Enter a valid topic UUID."); return;
+          }
+          setIpLoading(true); setError(""); setMessages([]);
+          try {
+            const data = await request("/api/v1/admin/topics/" + topicId.trim() + "/posts");
+            setMessages(data?.messages ?? []);
+            setMessage("Loaded " + (data?.messages?.length ?? 0) + " message(s).");
+          } catch (cause) {
+            setError(cause instanceof Error ? cause.message : "Could not load message IPs.");
+          } finally { setIpLoading(false); }
+        }}>
+          <label className="field-label">Topic UUID
+            <input value={topicId} onChange={event => setTopicId(event.target.value)} placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required />
+          </label>
+          <button className="button" type="submit" disabled={ipLoading}>{ipLoading ? "Loading…" : "Inspect messages"}</button>
+        </form>
+        {messages.length > 0 ? <div className="report-list">{messages.map(item => <article className="report-card" key={item.id}>
+          <p className="topic-meta">{dateLabel(item.createdAt)} · <code>{item.id}</code></p>
+          <p className="message-ip-content">{item.contentText}</p>
+          <p className="report-id"><strong>Source IP:</strong> <code>{item.ipAddress ?? "Not available (not captured or retention expired)"}</code></p>
+        </article>)}</div> : null}
+      </section>
       <div className="moderation-toolbar">
         <label className="field-label">Report status
           <select value={filter} onChange={event => setFilter(event.target.value)}>

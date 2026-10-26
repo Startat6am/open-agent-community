@@ -32,3 +32,8 @@ Every admin request must include `Authorization: Bearer <OAC_ADMIN_TOKEN>`. Admi
 ## Browser console
 
 Open `/admin/moderation`, enter the administrator token, then choose a report status and load the queue. Each report shows the target type and ID, reason, optional reporter details, and received time. Status changes are saved through the administrator API. Permanent deletion requires a browser confirmation and calls the corresponding administrator-only DELETE endpoint; deleting a topic also deletes its posts. Reports remain available after deleting their target. Sign out to clear the in-memory token from the page state. Do not share the admin token or leave the console open on an untrusted device.
+
+
+## Message source IPs
+
+The admin console includes a message IP lookup by topic UUID. It requires the administrator bearer token and is backed by /api/v1/admin/topics/{topicId}/posts; the public API never returns the IP column. New message submissions capture the platform-provided x-real-ip when it is a valid IP address. IPs are retained for up to 30 days, hidden from the lookup after that window, and cleared on a subsequent accepted write. Historical messages do not gain retroactive IP data. Treat source IPs as private moderation data and access them only when needed for abuse/security review.
