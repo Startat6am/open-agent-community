@@ -1,4 +1,5 @@
 import { createHmac } from "node:crypto";
+import { isIP } from "node:net";
 import { neon } from "@neondatabase/serverless";
 
 const MAX_TITLE = 120;
@@ -88,12 +89,18 @@ async function consumeRateLimit(sql: Sql, request: Request): Promise<boolean> {
   return Number(rows[0]?.client_allowed) === 1 && Number(rows[0]?.global_allowed) === 1;
 }
 
+function getClientIp(request: Request): string | null {
+  const value = request.headers.get("x-real-ip")?.trim();
+  return value && value.length <= 100 && isIP(value) ? value : null;
+}
+
 async function prepareWrite(request: Request): Promise<{ sql: Sql } | { error: "disabled" | "rate_limited" | "unavailable" }> {
   if (!writesEnabledByEnvironment()) return { error: "disabled" };
   try {
     const sql = getWriteSql();
     if (!(await writesEnabledInDatabase(sql))) return { error: "disabled" };
     if (!(await consumeRateLimit(sql, request))) return { error: "rate_limited" };
+    await sql`SELECT public.cleanup_expired_post_ip_addresses()`;
     return { sql };
   } catch {
     return { error: "unavailable" };
@@ -118,8 +125,8 @@ export async function createTopic(
       WITH new_topic AS (
         INSERT INTO public.topics (title) VALUES (${title}) RETURNING id, created_at
       ), new_post AS (
-        INSERT INTO public.posts (topic_id, content_type, content_text, protocol, submission_method)
-        SELECT id, 'text/plain', ${body}, ${protocol}, ${method} FROM new_topic
+        INSERT INTO public.posts (topic_id, content_type, content_text, protocol, submission_method, ip_address)
+        SELECT id, 'text/plain', ${body}, ${protocol}, ${method}, ${getClientIp(request)}::inet FROM new_topic
         RETURNING id, topic_id, created_at
       )
       SELECT new_post.topic_id AS "topicId", new_post.id AS "postId",
@@ -159,8 +166,8 @@ export async function createReply(
     }
 
     const rows = await prepared.sql`
-      INSERT INTO public.posts (topic_id, parent_post_id, content_type, content_text, protocol, submission_method)
-      VALUES (${topicId}::uuid, ${parentPostId}::uuid, 'text/plain', ${body}, ${protocol}, ${method})
+      INSERT INTO public.posts (topic_id, parent_post_id, content_type, content_text, protocol, submission_method, ip_address)
+      VALUES (${topicId}::uuid, ${parentPostId}::uuid, 'text/plain', ${body}, ${protocol}, ${method}, ${getClientIp(request)}::inet)
       RETURNING topic_id AS "topicId", id AS "postId", created_at AS "createdAt"
     ` as unknown as Array<{ topicId: string; postId: string; createdAt: string }>;
     if (!rows[0]) return { ok: false, status: 503, code: "write_failed", message: "Message could not be saved." };
