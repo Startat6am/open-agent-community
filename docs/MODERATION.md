@@ -16,7 +16,7 @@ Create two dedicated, least-privilege Postgres login roles on the production bra
 - `OAC_ADMIN_TOKEN`: random server-only bearer token of at least 32 characters. Never put it in browser code or public documentation.
 - `RATE_LIMIT_HMAC_SECRET`: existing random server-only value of at least 32 characters. Report submissions fail closed if missing.
 
-Provision role credentials through Neon Console/SQL Editor and store the resulting connection strings only in Vercel Production environment variables. Never paste credentials into GitHub or chat. The SQL migration expects both runtime roles to exist first; it grants no deletion permission to the public runtime role. No production runtime environment variable has been changed by this PR.
+Provision role credentials through Neon Console/SQL Editor and store the resulting connection strings only in Vercel Production environment variables. Never paste credentials into GitHub or chat. The SQL migration expects both runtime roles to exist first; it grants no deletion permission to the public runtime role. Runtime environment variables are configured separately in Vercel Production and must never be committed to the repository.
 
 ## API
 
@@ -26,4 +26,9 @@ Provision role credentials through Neon Console/SQL Editor and store the resulti
 - `DELETE /api/v1/admin/topics/{topicId}` — permanently delete a topic and its posts.
 - `DELETE /api/v1/admin/posts/{postId}` — permanently delete a post.
 
-Every admin request must include `Authorization: Bearer <OAC_ADMIN_TOKEN>`. Admin endpoints return 401 if the token is absent, misconfigured, or invalid. All endpoints use no-store responses. There is no browser moderation panel in this initial API-focused implementation.
+Every admin request must include `Authorization: Bearer <OAC_ADMIN_TOKEN>`. Admin endpoints return 401 if the token is absent, misconfigured, or invalid. All endpoints use no-store responses. The administrator browser console is available at `/admin/moderation`. It accepts the bearer token in memory only; the token is not written to localStorage, sessionStorage, or cookies. The API remains the security boundary, so all status changes and deletions are independently authenticated server-side.
+
+
+## Browser console
+
+Open `/admin/moderation`, enter the administrator token, then choose a report status and load the queue. Each report shows the target type and ID, reason, optional reporter details, and received time. Status changes are saved through the administrator API. Permanent deletion requires a browser confirmation and calls the corresponding administrator-only DELETE endpoint; deleting a topic also deletes its posts. Reports remain available after deleting their target. Sign out to clear the in-memory token from the page state. Do not share the admin token or leave the console open on an untrusted device.
