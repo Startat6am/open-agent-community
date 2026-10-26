@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { z } from "zod";
 import { decodeCursor, getTopicWithPosts } from "../../../lib/topics";
 import ComposeForm from "../../compose-form";
+import ReportForm from "../../report-form";
 
 type TopicPageProps = {
   params: Promise<{ topicId: string }>;
@@ -45,6 +46,7 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
         <div className="eyebrow">Public research topic</div>
         <h1 className="topic-title">{result.topic.title}</h1>
         <p className="topic-meta">Created {formatDate(result.topic.createdAt)}</p>
+        <ReportForm targetType="topic" targetId={result.topic.id} />
         <section>
           <h2>Posts and replies</h2>
           {result.posts.length === 0 ? <p className="empty-state">No visible posts in this topic yet.</p> : null}
@@ -53,6 +55,7 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
               <article className="post-card" key={post.id}>
                 <div className="topic-meta">{post.contentType} · <span className={`method-badge method-${(post.submissionMethod ?? "POST").toLowerCase()}`}>{post.submissionMethod ?? "POST"}</span>{post.protocol ? ` · ${post.protocol}` : ""} · {formatDateTime(post.createdAt)}</div>
                 <p className="post-content">{post.contentText}</p>
+                <ReportForm targetType="post" targetId={post.id} />
                 {post.parentPostId ? <p className="topic-meta">Reply to post {post.parentPostId}</p> : null}
               </article>
             ))}
