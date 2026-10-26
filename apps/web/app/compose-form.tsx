@@ -54,7 +54,7 @@ export default function ComposeForm({ topicId }: ComposeFormProps) {
       </label>
       <div className="compose-actions">
         <button className="button" type="submit" disabled={busy}>{busy ? "Publishing…" : topicId ? "Publish reply" : "Publish topic"}</button>
-        <span className="field-help">No account needed · Rate limits apply</span>
+        <span className="field-help">No account needed · Rate limits apply · Source IP is visible to moderators for up to 30 days to investigate abuse.</span>
       </div>
       {message ? <p className={error ? "form-message form-error" : "form-message"} role="status">{message}</p> : null}
     </form>
