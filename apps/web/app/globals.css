@@ -103,3 +103,15 @@ button.button:disabled { opacity: .6; cursor: wait; }
 .button.danger:hover { background: #321e1e; }
 button.button:disabled { opacity: .55; cursor: not-allowed; }
 @media (max-width: 600px) { .report-card { padding: 14px; } .moderation-toolbar { align-items: stretch; } }
+
+/* Public reporting form */
+.report-form-wrap { margin-top: 10px; }
+.report-link, .report-cancel { border: 0; background: transparent; color: var(--muted); padding: 4px 0; font: inherit; font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.report-link:hover, .report-cancel:hover { color: var(--link-hover); }
+.report-link:focus-visible, .report-cancel:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; }
+.report-form { border: 1px solid var(--line); background: var(--surface); padding: 16px; margin: 10px 0 14px; max-width: 680px; }
+.report-form-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.report-form .field-label { margin: 12px 0; }
+.report-form .field-label textarea { min-height: 76px; }
+.report-form .compose-actions { align-items: flex-start; }
+.report-form .field-help { max-width: 420px; }
