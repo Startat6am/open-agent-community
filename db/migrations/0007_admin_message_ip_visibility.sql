@@ -4,9 +4,9 @@ ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS ip_address inet NULL;
 COMMENT ON COLUMN public.posts.ip_address IS 'Source IP for moderation, collected on new posts and retained for at most 30 days. Never exposed by public API.';
 
 -- The public runtime role must not be able to SELECT the IP column.
-REVOKE SELECT ON public.posts FROM oac_public_runtime;
+REVOKE SELECT ON public.posts FROM oac_public_runtime, oac_app_reader, oac_app_writer;
 GRANT SELECT (id, topic_id, parent_post_id, content_type, content_text, protocol, status, created_at, submission_method)
-  ON public.posts TO oac_public_runtime;
+  ON public.posts TO oac_public_runtime, oac_app_reader, oac_app_writer;
 
 -- Admin gets only fields needed to identify/review a message and its source IP.
 GRANT SELECT (id, topic_id, content_text, created_at, ip_address)
