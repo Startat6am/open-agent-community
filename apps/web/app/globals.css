@@ -191,3 +191,65 @@ body { line-height: 1.6; }
   .hero h1 { font-size: 36px; }
   .topic-card { padding: 16px 3px; }
 }
+
+
+/* OAC palette refinement: deep navy foundations, restrained mocha surfaces, mist-blue actions */
+:root {
+  color-scheme: dark;
+  --bg: #101722;
+  --surface: #18212c;
+  --line: #35404b;
+  --text: #e9edf1;
+  --muted: #a5afb9;
+  --link: #b1c7df;
+  --link-hover: #d2e0ef;
+}
+html, body { background: #101722; color: #e9edf1; }
+body { background-image: radial-gradient(ellipse at 12% 0%, #243244 0%, transparent 42%); }
+.site-header { border-bottom-color: #303a45; }
+.brand-mark { background: #9fb8d3; color: #111b27; }
+.eyebrow { color: #b8a18d; }
+.live-dot { background: #9fb8d3; box-shadow: 0 0 12px #9fb8d344; }
+.hero .lead { color: #aeb8c2; }
+.section-heading { border-bottom-color: #35404b; }
+.feed-count { border-color: #3c4651; color: #aeb8c2; }
+.topic-card { border-bottom-color: #303943; }
+.topic-card:hover { background: #19232e; }
+.topic-marker { background: #302b29; color: #c6b09a; }
+.topic-card h3 a { color: #e5e9ed; }
+.topic-card h3 a:hover { color: #b9cee4; }
+.topic-meta { color: #a3adb7; }
+.meta-separator { color: #6e7a87; }
+.compose-panel {
+  background: linear-gradient(145deg, #252729 0%, #1b222b 70%);
+  border-color: #45413e;
+  box-shadow: 0 14px 36px #050a1024;
+}
+.aside-icon { background: #9fb8d3; color: #15202b; }
+.aside-copy { color: #abb4bd; }
+.field-label input, .field-label textarea, .field-label select {
+  border-color: #45474a;
+  background: #111923;
+  color: #e9edf1;
+}
+.field-label input:focus, .field-label textarea:focus, .field-label select:focus {
+  outline: 2px solid #91acc9;
+  outline-offset: 1px;
+  border-color: #91acc9;
+}
+.field-label input::placeholder, .field-label textarea::placeholder { color: #7f8994; }
+.field-help { color: #929da8; }
+.button, button.button {
+  background: #9fb8d3;
+  border-color: #9fb8d3;
+  color: #15202b;
+}
+.button:hover, button.button:hover { background: #bfd0e2; border-color: #bfd0e2; color: #101722; }
+.privacy-note { border-top-color: #414140; color: #a8b0b7; }
+.privacy-note span { color: #c6b09a; }
+.button.secondary { background: transparent; border-color: #56616d; color: #b9cee4; }
+.button.secondary:hover { background: #1d2a38; border-color: #91acc9; }
+.site-footer { border-top-color: #303a45; }
+.site-footer span:first-child { color: #b9cee4; }
+.site-footer span:nth-child(2), .site-footer a { color: #9ba6b1; }
+.empty-state { border-color: #35404b; background: #18212c; }
