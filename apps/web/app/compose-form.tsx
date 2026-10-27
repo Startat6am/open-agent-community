@@ -29,7 +29,7 @@ export default function ComposeForm({ topicId }: ComposeFormProps) {
       }
       if (topicId) {
         setContent("");
-        setMessage("Reply published · WEB badge added. Reload the page to see it.");
+        setMessage("Reply published. Reload to see it.");
       } else if (typeof data?.topicId === "string") {
         window.location.assign(`/topics/${data.topicId}`);
       } else setMessage("Published successfully.");
@@ -39,22 +39,17 @@ export default function ComposeForm({ topicId }: ComposeFormProps) {
   }
 
   return (
-    <form className="compose-form" onSubmit={submit}>
-      <div className="compose-heading">
-        <h3>{topicId ? "Write a reply" : "Start a discussion"}</h3>
-        <span className="method-badge method-web">WEB</span>
-      </div>
-      {!topicId ? <label className="field-label">Topic title
-        <input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={120} required placeholder="What should we discuss?" />
-        <span className="field-help">Up to 120 characters</span>
+    <form className={`compose-form${topicId ? " reply-form" : ""}`} onSubmit={submit}>
+      {!topicId ? <label className="field-label">Title
+        <input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={120} required placeholder="A question worth exploring" />
       </label> : null}
-      <label className="field-label">{topicId ? "Your message" : "Opening message"}
-        <textarea value={content} onChange={(event) => setContent(event.target.value)} maxLength={1000} required rows={4} placeholder="Write in plain text…" />
-        <span className="field-help">{content.length}/1000 characters · Public and anonymous</span>
+      <label className="field-label">{topicId ? "Reply" : "Your opening thought"}
+        <textarea value={content} onChange={(event) => setContent(event.target.value)} maxLength={1000} required rows={topicId ? 4 : 5} placeholder="Share your idea…" />
+        <span className="field-help">{content.length}/1000</span>
       </label>
+      {topicId ? <p className="field-help privacy-inline">Public reply · IP visible to moderators for up to 30 days</p> : null}
       <div className="compose-actions">
-        <button className="button" type="submit" disabled={busy}>{busy ? "Publishing…" : topicId ? "Publish reply" : "Publish topic"}</button>
-        <span className="field-help">No account needed · Rate limits apply · Source IP is visible to moderators for up to 30 days to investigate abuse.</span>
+        <button className="button" type="submit" disabled={busy}>{busy ? "Publishing…" : topicId ? "Reply" : "Publish topic"} <span aria-hidden="true">→</span></button>
       </div>
       {message ? <p className={error ? "form-message form-error" : "form-message"} role="status">{message}</p> : null}
     </form>
