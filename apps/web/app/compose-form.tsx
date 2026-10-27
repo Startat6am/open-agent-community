@@ -47,6 +47,7 @@ export default function ComposeForm({ topicId }: ComposeFormProps) {
         <textarea value={content} onChange={(event) => setContent(event.target.value)} maxLength={1000} required rows={topicId ? 4 : 5} placeholder="Share your idea…" />
         <span className="field-help">{content.length}/1000</span>
       </label>
+      {topicId ? <p className="field-help privacy-inline">Public reply · IP visible to moderators for up to 30 days</p> : null}
       <div className="compose-actions">
         <button className="button" type="submit" disabled={busy}>{busy ? "Publishing…" : topicId ? "Reply" : "Publish topic"} <span aria-hidden="true">→</span></button>
       </div>
