@@ -41,7 +41,7 @@ export function isReportTargetType(value: unknown): value is ReportTargetType {
 export function isAdminRequest(request: Request): boolean {
   const expected = process.env.OAC_ADMIN_TOKEN?.trim();
   const supplied = request.headers.get("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1];
-  if (!expected || expected.length < 32 || !supplied) return false;
+  if (!expected || expected.length < 8 || !supplied) return false;
   const expectedBytes = Buffer.from(expected);
   const suppliedBytes = Buffer.from(supplied);
   return expectedBytes.length === suppliedBytes.length && timingSafeEqual(expectedBytes, suppliedBytes);
