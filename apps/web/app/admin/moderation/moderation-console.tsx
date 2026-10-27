@@ -79,7 +79,7 @@ export default function ModerationConsole() {
   function signIn(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const candidate = tokenInput.trim();
-    if (candidate.length < 32) { setError("The admin token must contain at least 32 characters."); return; }
+    if (!candidate) { setError("Enter the admin token."); return; }
     setToken(candidate); setReports([]); setError("");
     setMessage("Token entered. Press “Load reports” to verify access.");
   }
@@ -125,7 +125,7 @@ export default function ModerationConsole() {
       <p className="topic-meta">Enter the server-side admin bearer token. It is held in memory only, never in localStorage or cookies.</p>
       <label className="field-label">Admin token
         <input type="password" autoComplete="off" value={tokenInput}
-          onChange={event => setTokenInput(event.target.value)} minLength={32} required />
+          onChange={event => setTokenInput(event.target.value)} required />
       </label>
       <div className="compose-actions"><button className="button" type="submit">Continue</button></div>
     </form> : <>
